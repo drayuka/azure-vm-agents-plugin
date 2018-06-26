@@ -38,6 +38,7 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudPageBlob;
 import com.microsoft.azure.storage.blob.ListBlobItem;
 import com.microsoft.azure.storage.core.PathUtility;
+import com.microsoft.azure.vmagent.AzureVMAgentTemplate;
 import com.microsoft.azure.vmagent.exceptions.AzureCloudException;
 import com.microsoft.azure.vmagent.retry.ExponentialRetryStrategy;
 import com.microsoft.azure.vmagent.retry.NoRetryStrategy;
@@ -96,6 +97,8 @@ public final class AzureVMManagementServiceDelegate {
     private static final String VIRTUAL_NETWORK_TEMPLATE_FRAGMENT_FILENAME = "/virtualNetworkFragment.json";
 
     private static final String PUBLIC_IP_FRAGMENT_FILENAME = "/publicIPFragment.json";
+
+    private static final String JOIN_DOMAIN_FRAGMENT_FILENAME = "/joinDomainFragment.json";
 
     private static final Map<String, List<String>> AVAILABLE_ROLE_SIZES = getAvailableRoleSizes();
 
@@ -368,6 +371,15 @@ public final class AzureVMManagementServiceDelegate {
             if (!(Boolean) properties.get("usePrivateIP")) {
                 addPublicIPResourceNode(tmp, mapper);
             }
+            
+            if(template.getJoinDomain()) {
+                addJoinDomainResourceNode(tmp, mapper);
+                putVariable(tmp, "domainName", template.getDomainName());
+                putVariable(tmp, "domainOUPath", template.getDomainOU());
+                StandardUsernamePasswordCredentials joinDomainCreds = template.getJoinDomainCredentials();
+                putVariable(tmp, "domainUser", joinDomainCreds.getUsername());
+                putVariable(tmp, "domainPassword", joinDomainCreds.getPassword().getPlainText());
+            }
 
             if (StringUtils.isNotBlank((String) properties.get("nsgName"))) {
                 addNSGNode(tmp, mapper, (String) properties.get("nsgName"));
@@ -418,6 +430,61 @@ public final class AzureVMManagementServiceDelegate {
 
     private static void copyVariableIfNotBlank(JsonNode template, Map<String, Object> properties, String name) {
         putVariableIfNotBlank(template, name, (String) properties.get(name));
+    }
+
+    //adds the join domain extension and makes sure the custom script extension is dependant on it.
+    private static void addJoinDomainResourceNode(JsonNode template, ObjectMapper mapper) throws IOException {
+        try (InputStream fragmentStream = AzureVMManagementServiceDelegate.class.getResourceAsStream(JOIN_DOMAIN_FRAGMENT_FILENAME)) {
+            final JsonNode joinDomainFragment = mapper.readTree(fragmentStream);
+
+            ArrayNode resourceNodes = ArrayNode.class.cast(template.get("resources"));
+            //iterator for main resource list in the template
+            Iterator<JsonNode> resourceNodesIter = resourceNodes.elements();
+            while (resourceNodesIter.hasNext()) {
+                JsonNode resourceNode = resourceNodesIter.next();
+                JsonNode typeNode = resourceNode.get("type");
+                if(typeNode == null || !typeNode.asText().equals("Microsoft.Compute/virtualMachines")) {
+                    continue;
+                }
+                ArrayNode vmResourceNodes = ArrayNode.class.cast(resourceNode.get("resources"));
+                //vm doesn't have a resources node
+                if(vmResourceNodes == null) {
+                    ObjectNode.class.cast(resourceNode).putArray("resources");
+                }
+                ArrayNode.class.cast(resourceNode.get("resources")).add(joinDomainFragment);
+
+                //iterator for the resources nodes under the vm
+                Iterator<JsonNode> vmResourceNodesIter = vmResourceNodes.elements();
+                while(vmResourceNodesIter.hasNext()) {
+                    JsonNode vmResourceNode = vmResourceNodesIter.next();
+                    JsonNode vmTypeNode = vmResourceNode.get("type");
+
+                    //doesn't have a type, not sure which resource it is
+                    if(vmTypeNode == null) {
+                        continue;
+                    } else if(vmTypeNode.asText().equals("extensions")) {
+                        //the custom script resource node, add a dependenancy which makes the join domain resource run first, if it isn't in the template, we won't do this
+                        ArrayNode dependsOnNode = ArrayNode.class.cast(vmResourceNode.get("dependsOn"));
+                        if(dependsOnNode == null) {
+                            ObjectNode.class.cast(vmResourceNode).putArray("dependsOn");
+                            dependsOnNode = ArrayNode.class.cast(vmResourceNode.get("dependsOn"));
+                        }
+                        dependsOnNode.add("[concat(resourceId('Microsoft.Compute/virtualMachines', concat(variables('vmname'), copyIndex())), '/extensions/joinDomain')]");
+                    } else if(vmTypeNode.asText().equals("Microsoft.Compute/virtualMachines/extensions")) {
+                        //the join domain node, add a dependance which verifies that the vm is run first
+                        ArrayNode dependsOnNode = ArrayNode.class.cast(vmResourceNode.get("dependsOn"));
+                        if(dependsOnNode == null) {
+                            ObjectNode.class.cast(vmResourceNode).putArray("dependsOn");
+                            dependsOnNode = ArrayNode.class.cast(vmResourceNode.get("dependsOn"));
+                        }
+                        dependsOnNode.add("[resourceId('Microsoft.Compute/virtualMachines/', concat(variables('vmname'), copyIndex()))]");
+                    } else {
+                        //has a type but is not the custom script or join domain nodes
+                        continue;
+                    }
+                }
+            }
+        }
     }
 
     private static void addPublicIPResourceNode(

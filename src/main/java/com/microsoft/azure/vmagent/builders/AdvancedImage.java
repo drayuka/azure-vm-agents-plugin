@@ -39,6 +39,14 @@ public class AdvancedImage {
 
     private String nsgName;
 
+    private boolean joinDomain;
+
+    private String domainName;
+
+    private String domainOU;
+
+    private String joinDomainCredentialsId;
+
     private String jvmOptions;
 
     private String noOfParallelJobs;
@@ -63,6 +71,10 @@ public class AdvancedImage {
                          String subnetName,
                          boolean usePrivateIP,
                          String nsgName,
+                         boolean joinDomain,
+                         String domainName,
+                         String domainOU,
+                         String joinDomainCredentialsId,
                          String jvmOptions,
                          String noOfParallelJobs,
                          boolean templateDisabled) {
@@ -84,6 +96,10 @@ public class AdvancedImage {
         this.subnetName = subnetName;
         this.usePrivateIP = usePrivateIP;
         this.nsgName = nsgName;
+        this.joinDomain = joinDomain;
+        this.domainName = domainName;
+        this.domainOU = domainOU;
+        this.joinDomainCredentialsId = joinDomainCredentialsId;
         this.jvmOptions = jvmOptions;
         this.noOfParallelJobs = noOfParallelJobs;
         this.templateDisabled = templateDisabled;
@@ -158,6 +174,22 @@ public class AdvancedImage {
 
     public String getNsgName() {
         return nsgName;
+    }
+
+    public boolean getJoinDomain() {
+        return joinDomain;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public String getDomainOU() {
+        return domainOU;
+    }
+
+    public String getJoinDomainCredentialsId() {
+        return joinDomainCredentialsId;
     }
 
     public String getJvmOptions() {

@@ -207,6 +207,14 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
 
     private final String nsgName;
 
+    private boolean joinDomain;
+
+    private String domainName;
+
+    private String domainOU;
+
+    private final String joinDomainCredentialsId;
+
     private final String jvmOptions;
 
     // Indicates whether the template is disabled.
@@ -260,6 +268,10 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
             String subnetName,
             boolean usePrivateIP,
             String nsgName,
+            boolean joinDomain,
+            String domainName,
+            String domainOU,
+            String joinDomainCredentialsId,
             String agentWorkspace,
             String jvmOptions,
             AzureVMCloudBaseRetentionStrategy retentionStrategy,
@@ -312,6 +324,10 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
         this.subnetName = subnetName;
         this.usePrivateIP = usePrivateIP;
         this.nsgName = nsgName;
+        this.joinDomain = joinDomain;
+        this.domainName = domainName;
+        this.domainOU = domainOU;
+        this.joinDomainCredentialsId = joinDomainCredentialsId;
         this.agentWorkspace = agentWorkspace;
         this.jvmOptions = jvmOptions;
         this.executeInitScriptAsRoot = executeInitScriptAsRoot;
@@ -362,6 +378,14 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
                 isBasic ? false : template.getUsePrivateIP());
         templateProperties.put("nsgName",
                 isBasic ? "" : template.getNsgName());
+        templateProperties.put("joinDomain",
+                isBasic ? false : template.getJoinDomain());
+        templateProperties.put("domainName",
+                isBasic ? "" : template.getDomainName());
+        templateProperties.put("domainOU",
+                isBasic ? "" : template.getDomainOU());
+        templateProperties.put("joinDomainCredentialsId",
+                isBasic ? "" : template.getJoinDomainCredentialsId());
         templateProperties.put("jvmOptions",
                 isBasic ? "" : template.getJvmOptions());
         templateProperties.put("noOfParallelJobs",
@@ -631,6 +655,10 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
         return AzureUtil.getCredentials(credentialsId);
     }
 
+    public StandardUsernamePasswordCredentials getJoinDomainCredentials() throws AzureCloudException {
+        return AzureUtil.getCredentials(joinDomainCredentialsId);
+    }
+
     public String getVirtualNetworkName() {
         return virtualNetworkName;
     }
@@ -657,6 +685,22 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
 
     public String getNsgName() {
         return nsgName;
+    }
+
+    public boolean getJoinDomain() {
+        return joinDomain;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public String getDomainOU() {
+        return domainOU;
+    }
+
+    public String getJoinDomainCredentialsId() {
+        return joinDomainCredentialsId;
     }
 
     public String getAgentWorkspace() {
@@ -787,6 +831,10 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
                 .withSubnetName(getSubnetName())
                 .withUsePrivateIP(getUsePrivateIP())
                 .withNetworkSecurityGroupName(getNsgName())
+                .withJoinDomain(getJoinDomain())
+                .withDomainName(getDomainName())
+                .withDomainOU(getDomainOU())
+                .withJoinDomainCredentialsId(getJoinDomainCredentialsId())
                 .withJvmOptions(getJvmOptions())
                 .withDisableTemplate(isTemplateDisabled())
                 .withRunScriptAsRoot(getExecuteInitScriptAsRoot())
@@ -927,6 +975,17 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
                             owner,
                             ACL.SYSTEM,
                             Collections.<DomainRequirement>emptyList()));
+        }
+
+        public ListBoxModel doFillJoinDomainCredentialsIdItems(@AncestorInPath Item owner) {
+            return new StandardListBoxModel().withAll(
+                CredentialsProvider.lookupCredentials(
+                    StandardUsernamePasswordCredentials.class,
+                    owner,
+                    ACL.SYSTEM,
+                    Collections.<DomainRequirement>emptyList()
+                )
+            );
         }
 
         public ListBoxModel doFillOsTypeItems() throws IOException, ServletException {

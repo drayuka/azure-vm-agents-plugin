@@ -91,6 +91,10 @@ public class AdvancedImageBuilder extends AdvancedImageFluent<AdvancedImageBuild
                 fluent.getSubnetName(),
                 fluent.isUsePrivateIP(),
                 fluent.getNsgName(),
+                fluent.getJoinDomain(),
+                fluent.getDomainName(),
+                fluent.getDomainOU(),
+                fluent.getJoinDomainCredentialsId(),
                 fluent.getJvmOptions(),
                 fluent.getNoOfParallelJobs(),
                 fluent.isTemplateDisabled());

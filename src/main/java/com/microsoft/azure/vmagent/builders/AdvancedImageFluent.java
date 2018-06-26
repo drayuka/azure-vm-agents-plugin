@@ -42,6 +42,14 @@ public class AdvancedImageFluent<T extends AdvancedImageFluent<T>> {
 
     private String nsgName;
 
+    private boolean joinDomain;
+
+    private String domainName;
+
+    private String domainOU;
+
+    private String joinDomainCredentialsId;
+
     private String jvmOptions;
 
     private String noOfParallelJobs;
@@ -141,6 +149,26 @@ public class AdvancedImageFluent<T extends AdvancedImageFluent<T>> {
         return (T) this;
     }
 
+    public T withJoinDomain(boolean joinDomain) {
+        this.joinDomain = joinDomain;
+        return (T) this;
+    }
+
+    public T withDomainName(String domainName) {
+        this.domainName = domainName;
+        return (T) this;
+    }
+    
+    public T withDomainOU(String domainOu) {
+        this.domainOU = domainOU;
+        return (T) this;
+    }
+    
+    public T withJoinDomainCredentialsId(String joinDomainCredentialsId) {
+        this.joinDomainCredentialsId = joinDomainCredentialsId;
+        return (T) this;
+    }
+
     public T withJvmOptions(String jvmOptions) {
         this.jvmOptions = jvmOptions;
         return (T) this;
@@ -226,6 +254,22 @@ public class AdvancedImageFluent<T extends AdvancedImageFluent<T>> {
 
     public String getNsgName() {
         return nsgName;
+    }
+
+    public boolean getJoinDomain() {
+        return joinDomain;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public String getDomainOU() {
+        return domainOU;
+    }
+
+    public String getJoinDomainCredentialsId() {
+        return joinDomainCredentialsId;
     }
 
     public String getJvmOptions() {

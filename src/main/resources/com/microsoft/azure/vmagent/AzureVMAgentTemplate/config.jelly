@@ -176,6 +176,23 @@
                         <f:textbox/>
                     </f:entry>
 
+                    <f:block field="joinDomain">
+                        <table>
+                            <f:optionalBlock name="dynamic" title="${%Join_Domain}">
+                                <f:entry title="${%Domain_Name}" field="domainName">
+                                    <f:textbox/>
+                                </f:entry>
+
+                                <f:entry title="${%Domain_OU}" field="domainOU">
+                                    <f:textbox/>
+                                </f:entry>
+
+                                <f:entry title="${%Domain_Join_Credentials}" field="domainJoinCredentialsId">
+                                    <c:select expressionAllowed="false"/>
+                                </f:entry>
+                            </f:optionalBlock>
+                        </table>
+                    </f:block>
 
                     <f:entry title="${%JVM_Options}" field="jvmOptions" help="/plugin/azure-vm-agents/help-jvmOptions.html">
                         <f:textbox/>
