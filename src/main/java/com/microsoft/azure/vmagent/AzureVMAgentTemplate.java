@@ -979,13 +979,11 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
 
         public ListBoxModel doFillJoinDomainCredentialsIdItems(@AncestorInPath Item owner) {
             return new StandardListBoxModel().withAll(
-                CredentialsProvider.lookupCredentials(
-                    StandardUsernamePasswordCredentials.class,
-                    owner,
-                    ACL.SYSTEM,
-                    Collections.<DomainRequirement>emptyList()
-                )
-            );
+                    CredentialsProvider.lookupCredentials(
+                            StandardUsernamePasswordCredentials.class,
+                            owner,
+                            ACL.SYSTEM,
+                            Collections.<DomainRequirement>emptyList()));
         }
 
         public ListBoxModel doFillOsTypeItems() throws IOException, ServletException {
