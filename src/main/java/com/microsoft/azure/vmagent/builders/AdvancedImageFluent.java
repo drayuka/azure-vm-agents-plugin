@@ -67,6 +67,7 @@ public class AdvancedImageFluent<T extends AdvancedImageFluent<T>> {
         this.usePrivateIP = false;
         this.noOfParallelJobs = "1";
         this.templateDisabled = false;
+        this.joinDomain = false;
     }
 
     //CHECKSTYLE:OFF

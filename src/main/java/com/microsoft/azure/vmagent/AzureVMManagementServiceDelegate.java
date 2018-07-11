@@ -378,7 +378,10 @@ public final class AzureVMManagementServiceDelegate {
                 putVariable(tmp, "domainOUPath", template.getDomainOU());
                 StandardUsernamePasswordCredentials joinDomainCreds = template.getJoinDomainCredentials();
                 putVariable(tmp, "domainUser", joinDomainCreds.getUsername());
-                putVariable(tmp, "domainPassword", joinDomainCreds.getPassword().getPlainText());
+                final ObjectNode joinDomainPasswordNode = mapper.createObjectNode();
+                joinDomainPasswordNode.put("type", "secureString");
+                joinDomainPasswordNode.put("defaultValue", joinDomainCreds.getPassword().getPlainText());
+                ObjectNode.class.cast(tmp.get("parameters")).set("domainPassword", joinDomainPasswordNode);
             }
 
             if (StringUtils.isNotBlank((String) properties.get("nsgName"))) {

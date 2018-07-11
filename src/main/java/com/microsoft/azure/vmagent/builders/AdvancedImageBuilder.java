@@ -33,6 +33,10 @@ public class AdvancedImageBuilder extends AdvancedImageFluent<AdvancedImageBuild
         fluent.withSubnetName(image.getSubnetName());
         fluent.withUsePrivateIP(image.isUsePrivateIP());
         fluent.withNetworkSecurityGroupName(image.getNsgName());
+        fluent.withJoinDomain(image.getJoinDomain());
+        fluent.withDomainName(image.getDomainName());
+        fluent.withDomainOU(image.getDomainOU());
+        fluent.withJoinDomainCredentialsId(image.getJoinDomainCredentialsId());
         fluent.withJvmOptions(image.getJvmOptions());
         fluent.withDisableTemplate(image.isTemplateDisabled());
         fluent.withRunScriptAsRoot(image.isExecuteInitScriptAsRoot());
@@ -66,6 +70,10 @@ public class AdvancedImageBuilder extends AdvancedImageFluent<AdvancedImageBuild
         fluent.withSubnetName(image.getSubnetName());
         fluent.withUsePrivateIP(image.isUsePrivateIP());
         fluent.withNetworkSecurityGroupName(image.getNsgName());
+        fluent.withJoinDomain(image.getJoinDomain());
+        fluent.withDomainName(image.getDomainName());
+        fluent.withDomainOU(image.getDomainOU());
+        fluent.withJoinDomainCredentialsId(image.getJoinDomainCredentialsId());
         fluent.withJvmOptions(image.getJvmOptions());
         fluent.withDisableTemplate(image.isTemplateDisabled());
         fluent.withRunScriptAsRoot(image.isExecuteInitScriptAsRoot());

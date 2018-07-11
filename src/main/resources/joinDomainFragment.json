@@ -17,7 +17,7 @@
             "Options": "3"
         },
         "protectedsettings": {
-            "Password": "[variables('domainPassword')]"
+            "Password": "[parameters('domainPassword')]"
         }
     }
 }

@@ -187,7 +187,7 @@
                                     <f:textbox/>
                                 </f:entry>
 
-                                <f:entry title="${%Domain_Join_Credentials}" field="domainJoinCredentialsId">
+                                <f:entry title="${%Domain_Join_Credentials}" field="joinDomainCredentialsId">
                                     <c:select expressionAllowed="false"/>
                                 </f:entry>
                             </f:optionalBlock>
@@ -220,7 +220,7 @@
             <f:entry title="${%Admin_Credentials}" field="credentialsId"
                      help="/plugin/azure-vm-agents/help-credentials.html">
                 <c:select expressionAllowed="false"/>
-            </f:entry>
+            </f:entry> 
         </f:section>
 
         <f:entry title="">
